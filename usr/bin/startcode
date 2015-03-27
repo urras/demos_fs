@@ -1,0 +1,11 @@
+tar civf /dev/fd0 /etc/passwd       \
+		  /etc/termcap      \
+		  /.cshrc           \
+		  /usr/bin/vs       \
+		  /usr/bin/edit     \
+		  /usr/bin/sc       \
+		  /usr/bin/Print    \
+		  /bin/pr           \
+		  /usr/bin/help/*   \
+		  /usr/практ/.cshrc \
+		  /usr/практ/*.ин

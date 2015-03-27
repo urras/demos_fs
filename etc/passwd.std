@@ -1,0 +1,11 @@
+root::0:2:Суперпользователь (The God):/:/bin/csh
+daemon:***:1:1:Дьявол во плоти:/:
+sys:***:2:2::/:
+bin:***:3:2::/:
+uucp::4:1:Сеть UUCP:/usr/spool/uucppublic:/usr/lib/uucp/uucico
+notes:***:5:1:Создатель Notesfiles:/usr/spool/notes:
+anon:***:6:1:Анонимный пользователь Notesfiles:/usr/spool/notes:
+news:***:7:1:Создатель новостей:/usr/spool/news:
+bugs:***:8:1:Адресат для сообщений об ошибках:/usr/spool/mail:/usr/bin/mail
+rubin:***:100:2:суперпользователь СУБД РУБИН:/usr/rubin:/bin/csh
+user::101:1:Пользователь:/usr/user:/usr/bin/vs

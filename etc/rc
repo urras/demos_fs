@@ -1,0 +1,99 @@
+:  rc стартовый файл системы
+#  '/etc/rc [ autoboot | fastboot  [ powerfail | "" ] ]'
+HOME=/; export HOME
+PATH=/etc:/bin:; export PATH
+MSG=r;export MSG
+LINE="echo  --- --- ---"
+STTY="stty cel15i dec 9600 crt"
+umount -a > /dev/null 2>&1
+(
+$STTY
+$LINE
+case $2 in
+powerfail)
+	echo ПЕРЕЗАГРУЗКА ПОСЛЕ СБОЯ ПИТАНИЯ
+	;;
+esac
+case $1 in
+autoboot)
+	echo Идет автоматическая перезагрузка...
+	date
+	fsck=y;;
+fastboot)
+	echo Быстрая перезагрузка...
+	date
+	fsck=n;;
+*)      date
+	echo -n '
+Введите дату и время в формате ДЕМОС  (ммддччмм)
+				      или (ччмм): '
+	read date
+	until date  $date
+	do echo -n 'Введите время (ммддччмм): '; read date; done
+	sync
+	$LINE
+	echo -n "Проверять файловые системы [да] ? "
+	read fsck
+esac
+$LINE
+case $fsck in
+[nNнН]*) pflag="";;
+*)     pflag="-p"
+echo   fsck -p1-2
+       fsck -p1-2
+	case $? in
+	0)
+		;;
+	4)
+		echo "Корректировалась корневая файловая система -- перезагрузка."
+		reboot -n
+		exit 1
+		;;
+	8)
+		echo "Автоматическая коррекция не удалась... помогите!"
+		exit 1
+		;;
+	12)
+		echo "Загрузка прервана"
+		exit 1
+		;;
+	*)
+		echo "Недопустимая ошибка при перезагрузке"
+		exit 1
+		;;
+	esac;;
+esac
+# set -x
+cp /dev/null /etc/mtab
+cp /dev/null /etc/utmp
+echo mount -a
+mount -a
+sync
+$LINE
+savecore / ndemos
+echo "<[?4l"
+# /etc/graf
+exit 0
+) > /dev/console 2>&1 < /dev/console || exit 1
+wait
+( cd /tmp; mkdir RED; mv rett*.* resv*.* RED
+rm -f *
+rm -rf /usr/tmp/*
+mv RED/* .
+rmdir RED
+cd /
+mkdir /tmp/lpd
+chmod 700 /tmp/lpd
+chown daemon /tmp/lpd
+# rm -f /usr/spool/uucp/LCK..*
+rm -f /usr/spool/lpd/lock /usr/spool/lpd/core ) 2> /dev/null >/dev/null &
+#
+ps -U
+/etc/hostname `cat /etc/localhostname`
+/etc/update &
+# /etc/cron &
+# /etc/accton /usr/adm/acct
+# nice -20 /etc/dostat &
+# nice -10 /etc/timstat &
+# /usr/lib/uucp/uu.daily &
+exit 0

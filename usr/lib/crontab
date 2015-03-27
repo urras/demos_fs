@@ -1,0 +1,6 @@
+20      14      *       *       *       /usr/bin/calendar -
+00      22      *       *       *       /etc/admclean
+0,10,20,30,40,50 * *    *       *       /bin/nice -30 /usr/lib/atrun
+# 45      23      *       *       *       echo Кис, пора спать! | /etc/wall
+# 35      11-20   *       *       *       nice -20 /etc/dostat ; /etc/timstat
+00,30      *       *       *       *       sh /usr/lib/uucp/uu.hourly

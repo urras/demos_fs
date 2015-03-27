@@ -1,0 +1,141 @@
+#!/bin/csh
+# mxtbl # Serg A. Usikow # KIAE Moscow # (k) - копи райт # Sun Feb 23 16:37:07 GMT 1986 #
+
+set L=78 O=0 Q=0 nonomatch Ma=mxtbl Ml=0 Tmp=/tmp/mx.$$ Pif=pif
+foreach i ( $* )
+if ( "$i" == -M ) set Ml=1
+end
+while ( $#argv > 0 )
+switch ("$argv[1]")
+case -l:
+if ( $#argv<2 ) then
+set Err="Bad -l arg" ; goto IfTrap
+endif
+set L=$2 Ma="$Ma -l $i" ; shift ; shift ; breaksw
+case -q:
+set Q=1 Ma="$Ma -q" ; shift ; breaksw
+case -N:
+set Pif=nroff Ma="$Ma -N" ; shift ; breaksw
+case -P:
+set Pif=pif Ma="$Ma -P" ; shift ; breaksw
+case -O:
+set O=1 Ma="$Ma -O" ; shift ; breaksw
+case -m:
+case -M:
+set Ml=1 Ma="$Ma -M" ; shift ; breaksw
+case -D:
+set echo Ma="$Ma -D" ; shift ; breaksw
+case -:
+set L=60 Ma="mx -" ; shift ; breaksw
+case -*:
+set Err="Bad key: $1" ; goto IfTrap
+default:
+break
+endsw
+end
+
+if ( $#argv < 1 ) then
+set Err="No file" ; goto IfTrap
+else
+set File = $1
+endif
+if ( -r "$File" ) then
+shift
+else
+set Err="File $File not found" ; goto IfTrap
+endif
+echo .pl 120  > $Tmp.g
+echo .ls $Q+1 >> $Tmp.g
+echo .ll $L >> $Tmp.g
+cat  $Tmp.g $File | unexpand -a | tbl -TX | $Pif | col -b | grep . > $Tmp.f
+if ( $status != 0 ) then
+set Err="Some error" ; goto IfTrap
+endif
+
+if ( $O == 1 ) then
+	cat $Tmp.f ; rm -f $Tmp.? ; exit 0
+endif
+
+set Z = ( 1 1 1 1 )
+if ( $#argv > 0 ) @ Z[2]=$1
+if ( $#argv > 1 ) @ Z[4]=$2
+if( $Z[2] < $Z[1] ) @ Z[2] = $Z[1]
+if( $Z[3] < $Z[2] ) @ Z[3] = $Z[2]
+if( $Z[4] < $Z[3] ) @ Z[4] = $Z[3]
+
+echo .ne 2+$Z[4]
+echo .nf
+echo .nr __ +1
+
+cat << === > $Tmp.e
+1s/_/\|/g
+1s/\|/_/g
+1s/^/.ds kh /
+$Z[4]a
+.. km
+\\*(kh
+.kt
+.km
+.
+$Z[3]a
+.de km
+.
+$Z[2]a
+.. kt
+.
+$Z[1]a
+.de kt
+.
+1t1
+1s/kh/ku/
+1s/_/\|/
+1s/_\$/\|/
+1s/_/-/g
+1,/\.\. km/p
+1,/\.\. km/d
+\$i
+.rn k3 k5
+.rn k4 k6
+.
+\$a
+.br
+.rm kh kt km ku
+.rn k5 k3
+.rn k6 k4
+.rr k#
+.nr __ -1
+.sp 1+\nv+\nq
+.ns
+.
+w
+q
+===
+
+ed - $Tmp.f < $Tmp.e
+
+cat << === > $Tmp.s
+s/\\(|[^_].*|\\)/.k1\\
+\\1\\
+.k2/
+s/\\(|_.*_|\\)/.k3\\
+\\1\\
+.k4/
+===
+
+sed -f $Tmp.s $Tmp.f
+
+rm -f $Tmp.? ; exit 0
+
+IfTrap:
+if ( $Ml == 0 ) then
+sh << ===
+echo Mxtbl_error: $Err. >&2
+===
+else
+mail $USER << ===
+Mxtbl_error in
+$Ma ... :
+$Err.
+===
+endif
+rm -f $Tmp.? ; exit 2

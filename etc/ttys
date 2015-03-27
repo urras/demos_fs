@@ -1,0 +1,3 @@
+0tty:ispeed:ospeed:ttytype:flags
+1console:9600:-:ccgd:dec,cel15i,tabs
+0chan:4800:-:el15ie:dec,cel15i,tabs

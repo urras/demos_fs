@@ -1,0 +1,6 @@
+superuser::0:root
+daemon::1:daemon
+sys::2:bin,sys,dmitry,avg,alex,fox,asa,rubin,dolbin,paremsky
+bin::3:bin,sys,dmitry,avg,fox,asa,alex
+uucp::4:uucp
+users::10:guest,player

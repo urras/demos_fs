@@ -1,0 +1,390 @@
+#!/bin/csh
+# mxsix command file # Serg A. Usikow # KIAE Moscow #
+
+set nonomatch
+set Tmp = /tmp/mxsix$$
+###########################################
+if ( "+$1" == +-dot ) goto Dot
+if ( "+$1" == +-ttl ) goto Ttl
+if ( "+$1" == +-pri ) goto Pri
+if ( "+$1" == +-lbl ) goto Labs
+if ( "+$1" == +-bbl ) goto Bbl
+if ( "+$1" == +-nms ) goto List
+if ( "+$1" == +-1 ) goto Man
+if ( "+$1" == +-2 ) goto Man
+if ( "+$1" == +-3 ) goto Man
+if ( "+$1" == +-4 ) goto Man
+if ( "+$1" == +-5 ) goto Man
+if ( "+$1" == +-6 ) goto Man
+if ( "+$1" == +-7 ) goto Man
+if ( "+$1" == +-8 ) goto Man
+if ( "+$1" == +-9 ) goto Man
+echo MXsix: Bad arguments.
+exit 2
+###########################################
+Man:
+
+if ( "$2" == "" ) then
+echo usage: mxsix $1 name '[keys]' ; exit 1
+endif
+
+@ n = ( 0 - $1 )
+shift
+
+echo $1 | tr a-z A-Z > $Tmp
+set nm = `cat $Tmp`
+
+set da = ( `date` )
+@ da[6] = ( $da[6] - 1900 )
+set da = ( $da[3] $da[2] $da[6] )
+
+cat << === > $Tmp
+.TH $nm $n "$da"
+.SH ИМЯ
+$1 \- кратчайшее пояснение
+===
+
+set nm = $1
+shift
+
+set k=
+foreach i ( $* )
+set k = "$k [-$i]"
+end
+
+cat << === | rpl _ ' ' >> $Tmp
+.SH ФОРМАТ
+$nm $k
+.SH ОПИСАНИЕ
+Команда $nm ...
+Ключи имеют следующий смысл:
+.RS
+===
+
+foreach i ( $* )
+echo .JP \"-$i\" | rpl _ ' ' >> $Tmp
+echo ' ...' >> $Tmp
+end
+
+cat << === >> $Tmp
+.RE
+.SH ПРИМЕРЫ
+.ES
+$nm ...
+$nm ...
+.EE
+.SH ФАЙЛЫ
+.ES
+files - ...
+files - ...
+.EE
+.SH ДОПОЛНИТЕЛЬНЫЕ ССЫЛКИ
+См. ...
+.SH ДИАГНОСТИКА
+.ES
+fatal error - ...
+.EE
+.SH ЗАМЕЧАНИЯ
+замечаний нет
+.SH ФАМИЛИЯ
+Usikow KIAE Moscow
+.SH АССЕМБЛЕР
+При вызове
+.EX MOV X,Y
+происходит ...
+===
+
+cat $Tmp > $nm.$n
+
+rm -f $Tmp
+
+exit 0
+###########################################
+Dot:
+shift
+mv $1 $1.bak
+sed "s/^'/./" $1.bak > $1
+exit 0
+###########################################
+Ttl:
+shift
+cat << \===
+.es "8624247.00001-04 91 01-1"
+.c+
+ОРДЕНА ЛЕНИНА И ОРДЕНА ОКТЯБРЬСКОЙ РЕВОЛЮЦИИ
+ИНСТИТУТ АТОМНОЙ ЭНЕРГИИ им. И.В.КУРЧАТОВА
+.si
+ОТДЕЛЕНИЕ ИНФОРМАТИКИ И ЭЛЕКТРОНИКИ
+'c-
+.si
+Утвержден
+\*(uu-ЛУ
+.to 3
+.c+
+ДИАЛОГОВАЯ ЕДИНАЯ МОБИЛЬНАЯ ОПЕРАЦИОННАЯ СИСТЕМА
+.si
+ДЕМОС
+.to 5
+\===
+echo $*
+cat << \===
+.si
+Руководство пользователя
+.si
+.if \n*>1 Листов \n*
+.to
+1986
+.tl @@@Литера@
+.an
+В данном документе содержится описание системы форматирования документации.
+.pd +
+\===
+exit 0
+###########################################
+Pri:
+shift
+set  w = 0   free = 0   lpw = 130
+if ( "$2" != "" ) set lpw = $2
+@ free = ( $lpw / 2 ) - $1
+@ w = ( 4 * $free ) + ( 2 * $1 )
+echo pr -2 -t -w$w
+exit 0
+###########################################
+Labs:
+shift
+sed -n                  \
+-e "s/^'/./"            \
+-e 's/\(.*\)".*"\(.*\)/\1 \2/'  \
+-e '/^\.sh .* ./p'      \
+-e '/^\.s0 .* ./p'      \
+-e '/^\.s1 .* ./p'      \
+-e '/^\.s2 .* ./p'      \
+-e '/^\.s3 .* ./p'      \
+-e '/^\.s4 .* ./p'      \
+-e '/^\.z1 ./p'      \
+-e '/^\.z2 ./p'      \
+-e '/^\.z3 ./p'      \
+-e '/^\.z4 ./p'      \
+-e '/^\.z5 ./p'      \
+-e '/^\.\[ ./p'      \
+-e '/^\.bo .* ./p'      \
+-e '/^\.g= .* ./p'      \
+-e '/^\.ph .* ./p'      \
+-e '/^\.pf .* ./p'      \
+-e '/^\.th .* ./p'      \
+-e '/^\.tf .* ./p'      \
+-e '/^\.np ./p'         \
+-e '/^\.lb ./p'          \
+$* | sed -e 's/.* \(.\)$/\1/' -e 's/.* \(..\)$/\1/'   |  \
+sort | uniq -c
+exit 0
+###########################################
+Bbl:
+shift
+sort $1 > $1.bak
+fgrep '"Маркс К. ' $1.bak > $1
+fgrep '"Маркс К. Энгельс Ф. '  $1.bak >> $1
+fgrep '"Энгельс Ф. ' $1.bak >> $1
+fgrep '"Ленин В.И. ' $1.bak >> $1
+fgrep -v '"Ленин В.И. ' $1.bak | fgrep -v '"Энгельс Ф. ' | fgrep -v '"Маркс К. ' | sort -u | grep -v '"[A-Z]'>> $1
+fgrep -v '"Ленин В.И. ' $1.bak | fgrep -v '"Энгельс Ф. ' | fgrep -v '"Маркс К. ' | sort -u | grep    '"[A-Z]'>> $1
+exit 0
+###########################################
+List:
+shift
+
+set Z = $Tmp.
+set I   = $Tmp.i
+set T   = $Tmp.t
+set E   = $Tmp.e
+set App = $Tmp.a
+set Str = $Tmp.s
+set Reg = $Tmp.r
+set Bak = $Tmp.b
+
+rm -f $Tmp.?
+
+expand $* > $T
+
+
+cat << === > $E
+s/\\\\".*//
+s/  */ /g
+s/\\\\\\\\/\\\\/g
+s/\\\\\\\\/\\\\/g
+s/\\\\\\\\/\\\\/g
+s/\\\\\\\\/\\\\/g
+s/\\\\n+/\\\\n/g
+s/\\\\n-/\\\\n/g
+===
+sed -f $E $T | grep . > $I
+
+
+cat << === > $E
+s/\\(.*\\)\\(\\\\n[^(]\\)\\(.*\\)/\\
+\\2\\
+/gp
+s/\\(.*\\)\\(\\\\n(..\\)\\(.*\\)/\\
+\\2\\
+/gp
+===
+sed -n -f $E $I | grep '^\\n' | rpl '^\\n(' ' ' | rpl '^\\n' ' ' | sort -u > $Reg
+
+
+cat << === > $E
+s/\\(.*\\)\\(\\\\\\*[^(]\\)\\(.*\\)/\\
+\\2\\
+/gp
+s/\\(.*\\)\\(\\\\\\*(..\\)\\(.*\\)/\\
+\\2\\
+/gp
+===
+sed -n -f $E $I | grep '^\\\*' | rpl '^\\\*(' ' ' | rpl '^\\\*' ' ' | sort -u > $Str
+
+
+cat << ===      > $E
+s/['.] nr /.nr /
+s/['.] rr /.rr /
+s/['.] af /.af /
+s/['.] am /.am /
+s/['.] di /.di /
+s/['.] da /.da /
+s/['.] rm /.rm /
+s/['.] ds /.ds /
+s/['.] as /.as /
+s/['.] wh /.wh /
+s/['.] ch /.ch /
+s/['.] dt /.dt /
+s/['.] it /.it /
+s/['.] em /.em /
+s/['.] de /.de /
+s/\\.nr/\\
+.nr/
+s/\\.rr/\\
+.rr/
+s/\\.af/\\
+.af/
+s/\\.am/\\
+.am/
+s/\\.di/\\
+.di/
+s/\\.da/\\
+.da/
+s/\\.rm/\\
+.rm/
+s/\\.ds/\\
+.ds/
+s/\\.as/\\
+.as/
+s/\\.rn/\\
+.rn/
+s/\\.wh/\\
+.wh/
+s/\\.ch/\\
+.ch/
+s/\\.dt/\\
+.dt/
+s/\\.it/\\
+.it/
+s/\\.em/\\
+.em/
+s/\\.de/\\
+.de/
+===
+sed -f $E $I  > $T
+grep ..... $T > $I
+
+
+cat << ===      > $E
+/^\\.wh/p
+/^\\.ch/p
+/^\\.dt/p
+/^\\.it/p
+/^\\.em/p
+===
+sed -n -f $E $I | rpl "^" "    " > $App
+
+cat << ===      > $E
+/^\\.de ./p
+/^\\.am ./p
+/^\\.di ./p
+/^\\.da ./p
+/^\\.ds ./p
+/^\\.as ./p
+===
+sed -n -f $E $I | sed 's/^\... \(..\).*/ \1/' >> $Str
+
+
+cat << ===      > $E
+s/^\\.rn//
+s/ /\\
+ /g
+===
+grep '^\.rn' $I | sed -f $E >> $Str
+
+
+cat << ===      > $E
+s/^\\.rm//
+s/ /\\
+ /g
+===
+grep '^\.rm' $I | sed -f $E >> $Str
+
+
+cat << ===      > $E
+/^\\.af/p
+/^\\.nr/p
+===
+sed -n -f $E $I | sed 's/^\... \(..\).*/ \1/' >> $Reg
+
+
+cat << ===      > $E
+s/^\\.rr//
+s/ /\\
+ /g
+===
+grep '^\.rr' $I | sed -f $E >> $Reg
+
+
+cat << === > $E
+s/.*\\(\\\\.\\).*/\\
+ \\1\\
+/gp
+===
+sed -n -f $E $I | grep '\\.' | rpl '\\' '\\' > $Bak
+
+
+echo ".in 0\
+.fi\
+.LP\
+.lp\
+В файле $argv[1] испольуются следующие строки:\
+.sp"
+cat $Str | rpl ' $' '' | sort -u | grep .
+
+echo ".fi\
+.LP\
+.lp\
+и следующие регистры:\
+.sp"
+cat $Reg | rpl ' $' '' | sort -u | grep .
+
+echo ".fi\
+.LP\
+.lp\
+Кроме того имеются следующие конструкции:
+.nf\
+.sp"
+cat $App | rpl ' $' '' | sort -u | grep .
+
+echo ".fi\
+.LP\
+.lp\
+а также конструкции с бэкслэшом:
+.nf\
+.sp"
+cat $Bak | rpl ' $' '' | sort -u | grep .
+
+rm -f $Tmp.?
+exit 0
+###########################################

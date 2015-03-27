@@ -1,0 +1,264 @@
+#!/bin/csh
+# mx command file # Serg A. Usikow # KIAE Moscow #
+unalias *
+
+set Tmac=/usr/lib/tmac/tmac.
+set nonomatch nocloberr path=(. /bin /usr/bin /usr/ucb)
+unset noglob
+set Mac=${Tmac}x Ma=mx Ml=0 Key
+set Tmp=/tmp/mx.$$ J=0 U=0 Pif=nroff
+set prep='sed -f $Tmp.z $*'
+echo .ds us $USER > $Tmp.s
+foreach i ( $* )
+if ( "$i" == -M ) set Ml=1
+end
+while ( $#argv > 0 )
+switch ("$argv[1]")
+case -a:
+if ( $#argv<2 ) then
+set Err="Bad -a arg" ; goto IfTrap
+endif
+set Ma="$Ma -a $2" ; echo $2 >> $Tmp.s ; shift ; shift ; breaksw
+case -b:
+set Key="$Key -rb1" Ma="$Ma -b" ; shift ; breaksw
+case -c:
+set Key="$Key -rc1" Ma="$Ma -c" ; shift ; breaksw
+case -d:
+set Key="$Key -rd1" Ma="$Ma -d" ; shift ; breaksw
+case -e:
+set Key="$Key -re1" Ma="$Ma -e" ; shift ; breaksw
+case -f:
+set Key="$Key -rf1" Ma="$Ma -f" ; shift ; breaksw
+case -g:
+set Key="$Key -rg1" Ma="$Ma -g" ; shift ; breaksw
+case -h:
+if ( $#argv<2 ) then
+set Err="Bad -h arg" ; goto IfTrap
+endif
+set Key="$Key -rh$2" Ma="$Ma -h $2" ; shift ; shift ; breaksw
+case -i:
+if ( $#argv<2 ) then
+set Err="Bad -i arg" ; goto IfTrap
+endif
+set Ma="$Ma -i" ; cat $2 >> $Tmp.s ; shift ; shift ; breaksw
+case -j:
+set J=1 Key="$Key -rj1" Ma="$Ma -j" ; shift ; breaksw
+case -k:
+set Key="$Key -rk1" Ma="$Ma -k" ; shift ; breaksw
+case -l:
+if ( $#argv<2 ) then
+set Err="Bad -l arg" ; goto IfTrap
+endif
+set Key="$Key -rl$2" Ma="$Ma -l $2" ; shift ; shift ; breaksw
+case -p:
+if ( $#argv<2 ) then
+set Err="Bad -p arg" ; goto IfTrap
+endif
+set Key="$Key -rp$2" Ma="$Ma -p $2" ; shift ; shift ; breaksw
+case -q:
+set Key="$Key -rq1" Ma="$Ma -q" ; shift ; breaksw
+case -s:
+set Key="$Key -rs1" Ma="$Ma -s" ; shift ; breaksw
+case -t:
+if ( $#argv<2 ) then
+set Err="Bad -t arg" ; goto IfTrap
+endif
+set Key="$Key -rt$2" Ma="$Ma -t $2" ; shift ; shift ; breaksw
+case -v:
+if ( $#argv<2 ) then
+set Err="Bad -v arg" ; goto IfTrap
+endif
+set Key="$Key -rv$2" Ma="$Ma -v $2" ; shift ; shift ; breaksw
+case -u:
+set U=1 Key="$Key -ru1" Ma="$Ma -u" ; shift ; breaksw
+case -z:
+set Key="$Key -rz1" Ma="$Ma -z" ; shift ; breaksw
+case -s0p:
+echo '.nr m0 1' >> $Tmp.s ; set Ma="$Ma -s0p" ; shift ; breaksw
+case -s0c:
+echo '.nr m0 2' >> $Tmp.s ; set Ma="$Ma -s0c" ; shift ; breaksw
+case -s1p:
+echo '.nr m1 1' >> $Tmp.s ; set Ma="$Ma -s1p" ; shift ; breaksw
+case -s1c:
+echo '.nr m1 2' >> $Tmp.s ; set Ma="$Ma -s1c" ; shift ; breaksw
+case -s2p:
+echo '.nr m2 1' >> $Tmp.s ; set Ma="$Ma -s2p" ; shift ; breaksw
+case -s2c:
+echo '.nr m2 2' >> $Tmp.s ; set Ma="$Ma -s2c" ; shift ; breaksw
+case -_:
+set Key="$Key -r_1" Ma="$Ma -_" ; shift ; breaksw
+case -N:
+set Pif=nroff Ma="$Ma -N" ; shift ; breaksw
+case -P:
+set Pif=pif Ma="$Ma -P" ; shift ; breaksw
+case -tbl:
+set prep='tbl $* | expand | sed -f $Tmp.z';shift;breaksw
+case -M:
+case -m:
+set Ml=1 Ma="$Ma -M" ; shift ; breaksw
+case -D:
+set echo Ma="$Ma -D" ; shift ; breaksw
+case -:
+set Key="$Key -re1 -rl60 -rp66 -rv1"  Ma="$Ma -" ; shift ; breaksw
+case =:
+set Key="$Key -re1 -rl60 -rp90 -rq1 -rv1"  Ma="$Ma -" ; shift ; breaksw
+case +:
+set Key="$Key -rl36 -rp23"  Ma="$Ma +" ; shift ; breaksw
+case -man:
+set Mac=${Tmac}an Ma="$Ma -man" ; shift ; breaksw
+case -cps:
+set Mac=${Tmac}cps Ma="$Ma -cps" ; shift ; breaksw
+# case -es:
+# echo ".nr ex 1\
+# .nr m0 2\
+# .nr m1 2\
+# .nr m2 1" >> $Tmp.s
+# set J=1 U=1 Key="-rb1 -re1 -rg1 -rh5 -rj1 -rl58 -rp66 -rq1 -rs1 -rt6 -rv1 -ru1"
+# set Ma="mx -es" ; shift ; breaksw
+case -es:
+echo ".nr ex 1\
+.nr m0 2\
+.nr m1 2\
+.nr m2 1" >> $Tmp.s
+set J=1 U=1 Key="-rb1 -rg1 -rh5 -rj1 -rl58 -rp66 -rs1 -rt6 -rv1 -ru1"
+set Ma="mx -es" ; shift ; breaksw
+case -ES:
+echo ".nr ex 1\
+.nr m0 2\
+.nr m1 2\
+.nr m2 1" >> $Tmp.s
+set J=1 U=1 Key="-rb1 -rg1 -rh5 -rj1 -rl58 -rp66 -rq1 -rs1 -rt6 -rv1 -ru1"
+set Ma="mx -es" ; shift ; breaksw
+case -*:
+set Err="Bad key: $1" ; goto IfTrap
+default:
+break
+endsw
+end
+
+if ( ! -r $Mac ) then
+set Err="File $Mac not found" ; goto IfTrap
+endif
+
+set i=1
+while ( $i <= $#argv )
+if ( -r "$argv[$i]" ) then
+@ i = $i + 1
+else
+set Err="File $argv[$i] not found" ; goto IfTrap
+endif
+end
+
+if ( $J == 1 ) then
+if ( $i == 1 ) then
+set Err="No input files" ; goto IfTrap
+endif
+
+cat << \=== > $Tmp.x
+s/s/x/
+/^[\.']x[h01234] .*\\$/{p
+n
+{
+:a
+/^.*\\$/s/.*/&/p
+/^.*\\$/n
+t a
+/^.*"/p
+}
+}
+/^[\.']x[h01234] .*/p
+\===
+sed -n -f $Tmp.x $* > $Tmp.y
+endif
+
+cat << \=== > $Tmp.z
+s/^'/./
+s/^\. *\(.*\)/.\1/
+/^\.\{/,/^\.\}/ s/\\/\\\\/
+/^\.\{/,/^\.\}/ s/^/\\!/
+s/^\\!\.\{/.\{/
+s/^\\!\.\}/.\}/
+/^\.es/,/^\.pd/ s/^\. f+//
+/^\.es/,/^\.pd/ s/^\. f=//
+/^\.es/,/^\.pd/ s/^\. f-//
+\===
+
+if ( $J == 1 ) then
+cat << \=== >> $Tmp.z
+/^\.es/,/^\.pd/ s/\\/\\\\/g
+/^\.es/,/^\.pd/ s/^/\\!/
+s/^\\!\.es/. es/
+s/^\\!\.an/. an/
+s/^\\!\.pd/. pd/
+\===
+endif
+
+if( $U == 1 ) then
+cat << \=== >> $Tmp.z
+/^\.(/,/^\.)/ s/^\./. /
+s/^\. (/.(/
+/^\.de/,/^\.\./ s/^\./. /
+s/^\. de/.de/
+s/^\. \./../
+s/^\.f+/..\
+. f+/
+s/^\.f-/. f-/
+s/^\.f=/..\
+. f=/
+s/^\.bo/. bo/
+s/^\.lb/. lb/
+s/^\.g+/. g+/
+s/^\.c+/. c+/
+s/^\.c-/. c-/
+s/^\.c=/. c=/
+s/^\.ce/. ce/
+s/^\.u+/. u+/
+s/^\.u-/. u-/
+s/^\.u=/. u=/
+s/^\.ul/. ul/
+s/^\.nx \(.*\)/.rn ?s ?t\
+. de ?s\
+. nr ? \\\\$1 \
+. ?f\
+..\
+. nx \1/
+s/^\.so \(.*\)/.rn ?s ?t\
+. de ?s\
+. nr ? \\\\$1 \
+. ?f\
+..\
+. so \1\
+. rn ?t ?s\
+. rm ? ??\
+. rr ?/
+s/^\(\.[^. ].*\)/..\
+.?e\
+\1/
+$a\
+..\
+.?e
+\===
+endif
+echo "$prep |  $Pif -i $Key -rn$$ $Mac $Tmp.s"
+eval $prep |  $Pif -i $Key -rn$$ $Mac $Tmp.s
+# tbl $* | expand | sed -f $Tmp.z | $Pif -i $Key -rn$$ $Mac $Tmp.s
+set Stat=$status
+
+if ( $Ml == 1 ) echo "End of: $Ma $1 $2 $3 $4 ... (Exit=$Stat)" | mail $USER
+rm -f $Tmp.?
+exit $Stat
+
+IfTrap:
+if ( $Ml == 0 ) then
+sh << ===
+echo Mx_error: $Err. >&2
+===
+else
+mail $USER << ===
+Mx_error in
+$Ma $1 $2 ... :
+$Err.
+===
+endif
+rm -f $Tmp.?
+exit 2

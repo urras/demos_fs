@@ -1,0 +1,4 @@
+/dev/rw0a:/:rw:7:1
+/dev/rw0c:/mnt/usera:rw:7:2
+/dev/fd0:?:XX:7:3
+/dev/fd1:?:XX:7:3

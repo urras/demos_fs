@@ -1,0 +1,29 @@
+set -x
+/etc/mknod console  c   0  0
+/etc/mknod tty00    c   0  1
+/etc/mknod lp       c   3  0
+/etc/mknod fd0      b  11  0
+/etc/mknod fde0     b  11  4
+/etc/mknod fd1      b  11  8
+/etc/mknod fde1     b  11 12
+/etc/mknod kmem     c   8  1
+/etc/mknod mem      c   8  0
+/etc/mknod null     c   8  2
+/etc/mknod rfd0     c  26  0
+/etc/mknod rfde0    c  26  4
+/etc/mknod rfd1     c  26  8
+/etc/mknod rfde1    c  26 12
+/etc/mknod rrw0a    c  24  0
+/etc/mknod rrw0b    c  24  1
+/etc/mknod rrw0c    c  24  2
+/etc/mknod rrw0h    c  24  7
+/etc/mknod rw0a     b  10  0
+/etc/mknod rw0b     b  10  1
+/etc/mknod rw0c     b  10  2
+/etc/mknod rw0h     b  10  7
+/etc/mknod tty      c  17  0
+chmod 666 *fd* tty  console null lp
+chmod 644 mem kmem *rw*
+chown 0.2 *
+ln fd0 fd0.rt
+ln fd1 fd1.rt

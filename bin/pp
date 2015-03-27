@@ -1,0 +1,1 @@
+echo -n @>/dev/lp;/usr/bin/Print $*

@@ -1,0 +1,44 @@
+task=t?
+if [ -n $*"" ]
+then task=$@
+fi
+cat hdr
+sleep 8
+echo -n "                 Дата и время :  ";date
+n=1
+if test -d /usr/bin
+then bin=/usr/bin
+     export bin
+fi
+ntest=""
+stat=ok
+export stat ntest
+for tst in $task
+do
+	sleep 4
+#       clear
+	echo "
+
+
+********************** Начало контрольной задачи $n **************************
+*                                                                           *
+	"
+	if $tst
+	then	echo "
+*                                                                           *
+*************** Успешное завершение контрольной задачи $n ********************
+"
+	else	echo "
+*                                                                           *
+************** Неуспешное завершение контрольной задачи $n *******************
+"
+		stat=bad
+		if [ -n $ntest"" ]
+		then ntest=$ntest", "$tst
+		else ntest=" "$tst
+		fi
+	fi
+n=`expr $n + 1`
+done
+printend
+rm -f list a.out done *.o tmp tmp0

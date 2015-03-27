@@ -1,0 +1,27 @@
+tar civf /dev/fd0 /usr/bin/start           \
+		  /usr/pract/vsh/*.c       \
+		  /usr/pract/vsh/*.h       \
+		  /usr/pract/vsh/Makefile  \
+		  /usr/pract/sc/*.c        \
+		  /usr/pract/sc/*.h        \
+		  /usr/pract/sc/*.y        \
+		  /usr/pract/sc/*.sed      \
+		  /usr/pract/sc/Makefile   \
+		  /usr/pract/sc/Mf         \
+		  /usr/pract/edit/*.c      \
+		  /usr/pract/edit/*.h      \
+		  /usr/pract/edit/Makefile \
+		  /usr/pract/edit/termcap* \
+		  /usr/lib/libovc.a        \
+		  /usr/lib/libovjobs.a     \
+		  /usr/lib/libovtermcap.a  \
+		  /usr/lib/libovm.a        \
+		  /usr/lib/yaccpar         \
+		  /usr/include/stdio.h     \
+		  /usr/include/ctype.h     \
+		  /usr/include/signal.h    \
+		  /usr/include/sys/ioctl.h \
+		  /usr/include/strings.h   \
+		  /usr/include/math.h      \
+		  /usr/bin/startcode       \
+		  /usr/bin/starttext
